@@ -8,9 +8,11 @@ import type { ConversationSnapshot, UseProjection } from '@deepseek-ai/dsh-clien
 import type { SnapshotSelectorHook } from '@deepseek-ai/dsh-client-ui-slots'
 // Type-only: merges the sessionStats key into SessionProjectionMap for useProjection.
 import type {} from '@deepseek-ai/dsh-session-stats/client'
+// Type-only: merges the tokenCost key into SessionProjectionMap for useProjection.
+import type {} from '@deepseek-ai/dsh-token-cost/client'
 import type { ContextPressureProjection, TokenUsageProjection } from '@deepseek-ai/dsh-token-meter/client'
 import type { ComposerBarProps } from '../contract/slots.ts'
-import { formatTokensPerSecond } from './message-chrome.ts'
+import { formatCost, formatTokensPerSecond } from './message-chrome.ts'
 import { assistantStepReading } from './turn-metrics.ts'
 import css from './StatsLine.module.css'
 
@@ -202,6 +204,12 @@ export const StatsLine = memo(function StatsLine({ useSession, useProjection, t 
       input: formatTokens(billedInputTokens(usage)),
       output: formatTokens(usage.outputTokens),
     }))
+  }
+  // Theoretical cost rides the durable tokenCost projection; a conversation
+  // whose steps all settled without a configured price shows no cost group.
+  const cost = useProjection('tokenCost')
+  if (cost !== undefined && cost.pricedSteps > 0) {
+    groups.push(t('stats.cost', { cost: formatCost(cost.total) }))
   }
   const line = groups.join(' | ')
   // The row elides with ellipsis when overlong; a delayed hover tooltip carries

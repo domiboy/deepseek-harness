@@ -21,6 +21,8 @@ export interface MessageIconActionsProps {
   ttftMs?: number | undefined
   /** Turn decode throughput, appended as `· 34 tok/s`; omitted when unrecorded. */
   tokensPerSecond?: number | undefined
+  /** Turn theoretical cost, appended as `· 花费 ¥0.0038`; omitted when unpriced. */
+  cost?: string | undefined
   /** Clock before icons (user) or after (assistant). */
   clock: 'start' | 'end'
   /** Fork the session at this message; omission hides the branch action. */
@@ -44,7 +46,7 @@ export interface MessageIconActionsProps {
  * @returns The actions row element.
  */
 export function MessageIconActions({
-  text, time, runMs, ttftMs, tokensPerSecond, clock, onBranch, branchUnavailable = false, className,
+  text, time, runMs, ttftMs, tokensPerSecond, cost, clock, onBranch, branchUnavailable = false, className,
   extraActions, t,
 }: MessageIconActionsProps) {
   const day = useCalendarDay()
@@ -103,6 +105,14 @@ export function MessageIconActions({
           <span className={css.runTimeDot} aria-hidden>·</span>
           {' '}
           {t('message.tokensPerSecond', { tps: formatTokensPerSecond(tokensPerSecond) })}
+        </>
+      )}
+      {cost !== undefined && (
+        <>
+          {' '}
+          <span className={css.runTimeDot} aria-hidden>·</span>
+          {' '}
+          {t('message.cost', { cost })}
         </>
       )}
     </span>

@@ -250,6 +250,28 @@ describe('StatsLine', () => {
       .toBe('1 轮 · 1 步| LLM 3.8s| 首 token 平均 0.8s · 20 tok/s| 缓存命中 90%| 输入 100 tok · 输出 5 tok')
   })
 
+  it('renders the whole-conversation theoretical cost group from the tokenCost projection', () => {
+    const { source } = makeSource({ nodes: [assistant(1, 1)] })
+    const view = render(<StatsLine {...props(source, {
+      tokenUsage: USAGE,
+      tokenCost: {
+        currency: 'CNY', total: 0.012, perTurn: {}, perStep: {}, pricedSteps: 2, unpricedSteps: 0,
+      },
+    })} />)
+    expect(view.container.textContent).toContain('Total cost ¥0.0120')
+  })
+
+  it('omits the cost group when no step was priced', () => {
+    const { source } = makeSource({ nodes: [assistant(1, 1)] })
+    const view = render(<StatsLine {...props(source, {
+      tokenUsage: USAGE,
+      tokenCost: {
+        currency: 'CNY', total: 0, perTurn: {}, perStep: {}, pricedSteps: 0, unpricedSteps: 2,
+      },
+    })} />)
+    expect(view.container.textContent).not.toContain('Total cost')
+  })
+
   it('renders without ResizeObserver support', () => {
     vi.unstubAllGlobals()
     const { source } = makeSource({ nodes: [assistant(1, 1)] })

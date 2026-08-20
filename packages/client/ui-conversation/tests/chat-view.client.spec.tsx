@@ -691,6 +691,55 @@ describe('ChatView', () => {
     expect(view.getAllByText(/20 tok\/s/)).toHaveLength(1)
   })
 
+  it('the settled footer appends the turn theoretical cost from the tokenCost projection', () => {
+    const first: AssistantMessageNode = {
+      kind: 'assistant', seq: 2, time: 2_000, turn: 1, step: 1, blocks: [{ kind: 'text', text: 'mid' }],
+      timing: { stepStartTime: 1_000, firstTokenTime: 2_200, completedTime: 5_200 },
+      usage: { outputTokens: 40 },
+    }
+    const h = makeHarness({
+      nodes: [user(1, 'hi'), first],
+      turnTimings: new Map([[1, { startTime: 1_000, endTime: 5_000 }]]),
+      turnEnds: new Map([[1, 5]]),
+    })
+    const tokenCost = {
+      currency: 'CNY',
+      total: 0.012,
+      perTurn: { '1': 0.012 },
+      perStep: { '1:1': 0.012 },
+      pricedSteps: 1,
+      unpricedSteps: 0,
+    }
+    h.props.useProjection = ((key: string, selector?: (value: unknown) => unknown) => {
+      const value = key === 'tokenCost' ? tokenCost : undefined
+      return selector === undefined ? value : selector(value)
+    })
+    const view = render(<h.ChatView {...h.props} />)
+    expect(view.getAllByText(/花费 ¥0\.0120/)).toHaveLength(1)
+  })
+
+  it('withholds the cost segment while the turn has no priced step', () => {
+    const first: AssistantMessageNode = {
+      kind: 'assistant', seq: 2, time: 2_000, turn: 1, step: 1, blocks: [{ kind: 'text', text: 'mid' }],
+      timing: { stepStartTime: 1_000, firstTokenTime: 2_200, completedTime: 5_200 },
+      usage: { outputTokens: 40 },
+    }
+    const h = makeHarness({
+      nodes: [user(1, 'hi'), first],
+      turnTimings: new Map([[1, { startTime: 1_000, endTime: 5_000 }]]),
+      turnEnds: new Map([[1, 5]]),
+    })
+    const tokenCost = {
+      currency: 'CNY', total: 0, perTurn: {}, perStep: {}, pricedSteps: 0, unpricedSteps: 1,
+    }
+    h.props.useProjection = ((key: string, selector?: (value: unknown) => unknown) => {
+      const value = key === 'tokenCost' ? tokenCost : undefined
+      return selector === undefined ? value : selector(value)
+    })
+    const view = render(<h.ChatView {...h.props} />)
+    expect(view.queryByText(/花费/)).toBeNull()
+  })
+
   it('withholds ttft and throughput while the turn is still running', () => {
     const settled: AssistantMessageNode = {
       kind: 'assistant', seq: 2, time: 2_000, turn: 1, step: 1, blocks: [{ kind: 'text', text: 'answer' }],

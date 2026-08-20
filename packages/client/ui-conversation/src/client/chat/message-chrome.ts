@@ -70,6 +70,17 @@ export function formatTokensPerSecond(tps: number): string {
 }
 
 /**
+ * Compact CNY cost: two decimals from one yuan up, four below one cent, six
+ * decimals for micro-costs (typical DeepSeek calls cost thousandths of a yuan).
+ * @param value - the cost in the pricing currency.
+ * @returns the display string with the currency symbol.
+ */
+export function formatCost(value: number): string {
+  const digits = value >= 1 ? 2 : value >= 0.01 ? 4 : 6
+  return `¥${value.toFixed(digits)}`
+}
+
+/**
  * Compact local timestamp for message IconActions. Same calendar day →
  * `HH:mm`; earlier this year → the `clock.md` date template + clock; other
  * years → the `clock.ymd` template + clock. Pure: the date templates arrive

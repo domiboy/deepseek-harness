@@ -90,6 +90,10 @@
     - id: session-stats
       name: '@deepseek-ai/dsh-session-stats'
 
+    # Theoretical per-call / per-conversation API cost projection.
+    - id: token-cost
+      name: '@deepseek-ai/dsh-token-cost'
+
     # Resolve bind host, SSH launch, and display once at boot, then mount the
     # matching dual-face directory picker. Mount -native or -browse directly in
     # an overlay to pin the interaction.

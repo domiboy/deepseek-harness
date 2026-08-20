@@ -3,7 +3,7 @@
 import { describe, expect, it } from 'vitest'
 import type { AssistantMessageNode, ConversationNode, UserMessageNode } from '@deepseek-ai/dsh-client-runtime/client'
 import { assistantStepReading, deriveTurnMetrics } from '../src/client/chat/turn-metrics.ts'
-import { formatLatencySeconds, formatTokensPerSecond } from '../src/client/chat/message-chrome.ts'
+import { formatCost, formatLatencySeconds, formatTokensPerSecond } from '../src/client/chat/message-chrome.ts'
 
 interface StepSpec {
   seq: number
@@ -150,5 +150,8 @@ describe('footer figure formatters', () => {
     expect(formatTokensPerSecond(9.96)).toBe('10')
     expect(formatTokensPerSecond(3.14)).toBe('3.1')
     expect(formatTokensPerSecond(-1)).toBe('0')
+    expect(formatCost(0.012)).toBe('¥0.0120')
+    expect(formatCost(2)).toBe('¥2.00')
+    expect(formatCost(0.0005)).toBe('¥0.000500')
   })
 })
