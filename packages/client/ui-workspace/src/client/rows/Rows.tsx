@@ -27,6 +27,18 @@ function displayTitle(node: SessionNode, t: RowTranslate): string {
   return node.blank ? t('session.new') : node.title
 }
 
+
+/**
+ * Compact CNY cost for a session row (mirrors the conversation footer's
+ * formatter; a client package must not import another plugin's internals).
+ * @param value - the cost in the pricing currency.
+ * @returns the display string with the currency symbol.
+ */
+function costLabel(value: number): string {
+  const digits = value >= 1 ? 2 : value >= 0.01 ? 4 : 6
+  return `¥${value.toFixed(digits)}`
+}
+
 /** Localized compact relative time ("刚刚"/"5分钟" in zh, "now"/"5min" in en). */
 function timeLabel(updatedAt: number, now: number, t: RowTranslate): string {
   const { unit, n } = relativeTime(updatedAt, now)
@@ -441,6 +453,9 @@ export function SessionNodeItem({ node, currentId, now, onOpen, onRename, onFork
           happened in it yet, so a "now" timestamp and the row verbs
           (rename/fork/archive) would all act on content that does not
           exist — both trailing cells stay off until the first prompt. */}
+      {!row.blank && row.tokenCost !== undefined && (
+        <span className={css.cost} title={t('row.cost')}>{costLabel(row.tokenCost)}</span>
+      )}
       {!row.blank && <span className={css.time}>{timeLabel(row.updatedAt, now, t)}</span>}
       {!row.blank && (
         <span className={css.rowActions}>

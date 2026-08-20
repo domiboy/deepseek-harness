@@ -68,6 +68,7 @@ export const zh = {
   'time.months': '{n}个月',
   'time.years': '{n}年',
   'time.ago': '{t}前',
+  'row.cost': '对话总花费',
 } satisfies Record<string, string>
 
 /** The workspace namespace key union. */
@@ -137,4 +138,5 @@ export const en = {
   'time.months': '{n}mo',
   'time.years': '{n}y',
   'time.ago': '{t} ago',
+  'row.cost': 'Conversation cost',
 } satisfies Record<WorkspaceKey, string>

@@ -212,6 +212,14 @@
   color: var(--dsw-alias-label-tertiary);
 }
 
+.cost {
+  flex: none;
+  font-size: 11px;
+  line-height: 20px;
+  color: var(--dsw-alias-label-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
 .dot {
   flex: none;
 }

@@ -8,6 +8,9 @@ import {
   type SessionSearchResultItem, type SessionSummary, type SubagentDescendantSummary,
   type WorkspaceId, type WorkspaceView,
 } from '@deepseek-ai/dsh-client-runtime/client'
+// Type-only: merges the tokenCost key into SessionProjectionMap so the summary's
+// projection baseline reads as typed.
+import type {} from '@deepseek-ai/dsh-token-cost/client'
 
 /** Group key for Sessions outside every Workspace. */
 export const UNGROUPED_KEY = ''
@@ -30,6 +33,8 @@ export interface SessionNode {
   /** Finished running while not selected and not yet opened (the green "done" reminder dot). */
   completed: boolean
   updatedAt: number
+  /** Whole-conversation theoretical API cost, when the projection baseline prices at least one step. */
+  tokenCost?: number
 }
 
 /** Session order selected by the Workspace browser. */
@@ -224,6 +229,9 @@ function sessionNode(
     completed: s.completed === true,
     updatedAt: s.updatedAt,
     ...(s.pendingInteraction === undefined ? {} : { pendingInteraction: s.pendingInteraction }),
+    ...(s.projectionValues?.tokenCost !== undefined && s.projectionValues.tokenCost.pricedSteps > 0
+      ? { tokenCost: s.projectionValues.tokenCost.total }
+      : {}),
   }
 }
 

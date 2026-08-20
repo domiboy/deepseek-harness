@@ -3232,6 +3232,9 @@ importers:
       '@deepseek-ai/dsh-invariants':
         specifier: workspace:^
         version: link:../../runtime-diagnostics/invariants
+      '@deepseek-ai/dsh-token-cost':
+        specifier: workspace:^
+        version: link:../../llm/token-cost
       '@types/react':
         specifier: ~18.3.1
         version: 18.3.31

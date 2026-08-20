@@ -6,6 +6,8 @@ import {
   deriveFlat, deriveGroups, deriveSearchResults, workspaceLabel, relativeTime,
   UNGROUPED_KEY, UNGROUPED_LABEL,
 } from '../src/client/tree.ts'
+// Type-only: merges the tokenCost key into SessionProjectionMap for the projection baseline fixture.
+import type {} from '@deepseek-ai/dsh-token-cost/client'
 import { createWorkspaceViewStore } from '../src/client/stores.ts'
 
 const sid = (id: string) => id as SessionId
@@ -428,6 +430,26 @@ describe('createWorkspaceViewStore', () => {
 })
 
 describe('workspaceLabel', () => {
+  it('projects the theoretical cost into session rows only when the baseline priced a step', () => {
+    const priced = summary('priced', 1_000)
+    priced.projectionValues = {
+      tokenCost: { currency: 'CNY', total: 0.012, perTurn: {}, perStep: {}, pricedSteps: 2, unpricedSteps: 0 },
+    }
+    const unpriced = summary('unpriced', 2_000)
+    unpriced.projectionValues = {
+      tokenCost: { currency: 'CNY', total: 0, perTurn: {}, perStep: {}, pricedSteps: 0, unpricedSteps: 1 },
+    }
+    const groups = deriveGroups(
+      list(priced, unpriced),
+      [workspace('w', ['priced', 'unpriced'])],
+      noArchive,
+      view(['w']),
+    )
+    const rows = groups[0]!.sessions
+    expect(rows.find(row => row.id === sid('priced'))?.tokenCost).toBe(0.012)
+    expect(rows.find(row => row.id === sid('unpriced'))?.tokenCost).toBeUndefined()
+  })
+
   it('uses the Ungrouped fallback and extracts POSIX and Windows basenames', () => {
     expect(workspaceLabel(undefined)).toBe(UNGROUPED_LABEL)
     expect(workspaceLabel('')).toBe(UNGROUPED_LABEL)
