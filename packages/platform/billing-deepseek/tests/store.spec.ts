@@ -79,7 +79,7 @@ describe('computeReport', () => {
     expect(report.currentTotal).toBe(110)
     expect(report.grantedBalance).toBe(10)
     expect(report.toppedUpBalance).toBe(100)
-    expect(report.platformLifetimeConsumption).toBe(0)
+    expect(report.platformLifetimeConsumption).toBe(90) // oldest 200 − current 110, tracked locally
     expect(report.historySince).toBe(s0.at)
     expect(report.historyCount).toBe(4)
     const byKey = byWindow(report)
@@ -89,17 +89,18 @@ describe('computeReport', () => {
     expect(byKey.all.consumed).toBe(90)     // s0 (200) − s3 (110)
   })
 
-  it('reports null consumption for windows that predate all tracking', () => {
+  it('falls back to the earliest snapshot when tracking began after the window opened', () => {
     const sameDay = [
       snapshot(new Date(2026, 7, 20, 10, 0).getTime(), '120.00'),
       s3,
     ]
     const report = computeReport(sameDay, now, 'CNY')
     const byKey = byWindow(report)
-    expect(byKey.today.consumed).toBeNull()
-    expect(byKey.week.consumed).toBeNull()
-    expect(byKey.month.consumed).toBeNull()
+    expect(byKey.today.consumed).toBe(10) // earliest 120 − current 110
+    expect(byKey.week.consumed).toBe(10)
+    expect(byKey.month.consumed).toBe(10)
     expect(byKey.all.consumed).toBe(10)
+    expect(report.platformLifetimeConsumption).toBe(10)
   })
 
   it('honours the configured currency and falls back to the first line otherwise', () => {

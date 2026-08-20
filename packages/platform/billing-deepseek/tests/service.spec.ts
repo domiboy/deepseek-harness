@@ -45,7 +45,7 @@ describe('createBillingUsageService', () => {
     expect(report?.historyCount).toBe(2)
     expect(report?.currentTotal).toBe(110)
     expect(report?.windows.find(w => w.key === 'today')?.consumed).toBe(10)
-    expect(report?.platformLifetimeConsumption).toBe(0)
+    expect(report?.platformLifetimeConsumption).toBe(10) // oldest 120 − current 110
   })
 
   it('falls back to the platform first currency when no filter is configured', async () => {

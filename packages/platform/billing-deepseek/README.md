@@ -11,7 +11,7 @@ The DeepSeek open platform exposes one billing endpoint, [`GET /user/balance`](h
 - polls that endpoint into an append-only local history (JSONL) at a configurable interval, so snapshots accumulate even between agent turns;
 - registers the model-facing tool `query_api_usage(window?, refresh?)` that reports the current balance, the platform lifetime consumption (`granted + topped-up − total`), and the consumption attributed to the requested window (`today` / `week` / `month` / `all`), derived from balance deltas over the stored history.
 
-The platform has no consumption-history API, so all window consumption is derived locally: for each window, the latest snapshot at or before the window start is the baseline, and consumption is `baseline balance − current balance`. A window that predates all tracking reports `consumed: null` (it cannot be attributed). A negative value means a top-up outpaced spending.
+The platform has no consumption-history API and reports only remaining balances (its `topped_up_balance` is the current remaining topped-up portion), so all consumption is derived locally from the snapshot history: for each window, the latest snapshot at or before the window start is the baseline, and consumption is `baseline balance − current balance`. When tracking began after the window opened, the earliest snapshot becomes the baseline, so the window reports consumption since tracking began; only a completely empty history reports `consumed: null`. A negative value means a top-up outpaced spending. `platformLifetimeConsumption` is likewise the tracked lifetime (earliest snapshot − current), not a platform-reported figure.
 
 ## Configuration
 

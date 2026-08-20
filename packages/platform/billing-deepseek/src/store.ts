@@ -161,12 +161,14 @@ const WINDOW_STARTS: Record<Exclude<WindowKey, 'all'>, (now: number) => number> 
 
 /**
  * Consumption attributable to one dated window: the latest baseline snapshot at or before
- * the window start, minus the current snapshot. Null when no snapshot predates the window
- * start (tracking began after the window opened), so the window cannot be attributed.
+ * the window start, minus the current snapshot. When no snapshot predates the window start
+ * (tracking began after the window opened), the earliest snapshot becomes the baseline, so
+ * the window reports consumption since tracking began instead of an unattributable dash;
+ * only a completely empty history yields null.
  * @param sorted - snapshots ascending by `at`.
  * @param windowStart - epoch milliseconds of the window start.
  * @param currency - currency whose totals are compared.
- * @returns the rounded consumed amount, or null when no baseline exists.
+ * @returns the rounded consumed amount, or null when history is empty.
  */
 function consumptionInWindow(sorted: readonly BalanceSnapshot[], windowStart: number, currency: string): number | null {
   let baseline: BalanceSnapshot | undefined
@@ -174,6 +176,7 @@ function consumptionInWindow(sorted: readonly BalanceSnapshot[], windowStart: nu
     if (snapshot.at <= windowStart) baseline = snapshot
     else break
   }
+  if (baseline === undefined) baseline = sorted[0]
   if (baseline === undefined) return null
   const current = sorted.at(-1) ?? baseline
   const baseTotal = balanceOf(baseline, currency)
@@ -222,9 +225,13 @@ export function computeReport(snapshots: readonly BalanceSnapshot[], now: number
     currentTotal: info === undefined ? 0 : amount(info.totalBalance),
     grantedBalance: info === undefined ? 0 : amount(info.grantedBalance),
     toppedUpBalance: info === undefined ? 0 : amount(info.toppedUpBalance),
-    platformLifetimeConsumption: info === undefined
+    // The platform reports remaining balances (`topped_up_balance` is the
+    // current remaining topped-up portion), so a single snapshot cannot
+    // derive lifetime spend; track it from the local history instead
+    // (oldest total − current total), like the `all` window.
+    platformLifetimeConsumption: oldest === undefined || info === undefined
       ? 0
-      : round2(amount(info.grantedBalance) + amount(info.toppedUpBalance) - amount(info.totalBalance)),
+      : round2(amount(balanceOf(oldest, effectiveCurrency)?.totalBalance ?? '0') - amount(info.totalBalance)),
     windows,
     historySince,
     historyCount: sorted.length,
