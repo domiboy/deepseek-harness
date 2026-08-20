@@ -105,6 +105,11 @@
     - id: api-gateway
       name: '@deepseek-ai/dsh-host-apiproxy'
 
+    # DeepSeek open-platform balance tracking: the query_api_usage tool, the
+    # poller, and the billing service + settings section the web card reads.
+    - id: billing-deepseek
+      name: '@deepseek-ai/dsh-billing-deepseek'
+
     - id: cordis-host-runner
       name: '@deepseek-ai/dsh-cordis-host-runner'
 
@@ -283,6 +288,10 @@
     # cards. A namespace this deployment does not expose renders nothing.
     - id: ui-settings-plugins
       name: '@deepseek-ai/dsh-client-ui-settings-plugins'
+
+    # DeepSeek billing dashboard card in the plugin configuration section.
+    - id: ui-billing
+      name: '@deepseek-ai/dsh-client-ui-billing'
 
     # Plan control: the composer plan seat over the plan projection + /plan channel.
     - id: ui-plan

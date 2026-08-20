@@ -12,6 +12,9 @@
       "path": "../../goal/goal"
     },
     {
+      "path": "../../platform/billing-deepseek"
+    },
+    {
       "path": "../../settings/settings"
     },
     {

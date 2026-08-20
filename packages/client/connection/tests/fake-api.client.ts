@@ -205,6 +205,10 @@ export class FakeApiClient implements IApiClient {
     clear: payload => this.record('goal.clear', payload, Promise.resolve(ok({ cleared: true as const }))),
   }
 
+  readonly billing: IApiClient['billing'] = {
+    usage: payload => this.record('billing.usage', payload, Promise.resolve(ok({ ok: false as const, reason: '未装配 billing-deepseek 插件' }))),
+  }
+
   readonly settings: IApiClient['settings'] = {
     describe: payload => this.record('settings.describe', payload, Promise.resolve(ok({ writable: true, hasDocument: false, namespaces: [] }))),
     openDocument: payload => this.record('settings.openDocument', payload, Promise.resolve(ok({ opened: true as const }))),

@@ -84,6 +84,7 @@ export class ApiProxyService extends Service implements ApiProxy {
   readonly workspace: ApiProxy['workspace']
   readonly host: ApiProxy['host']
   readonly goals: ApiProxy['goals']
+  readonly billing: ApiProxy['billing']
   readonly skills: ApiProxy['skills']
   readonly agentPresets: ApiProxy['agentPresets']
   readonly settings: ApiProxy['settings']
@@ -112,6 +113,7 @@ export class ApiProxyService extends Service implements ApiProxy {
     this.workspace = api.workspace
     this.host = api.host
     this.goals = api.goals
+    this.billing = api.billing
     this.skills = api.skills
     this.agentPresets = api.agentPresets
     this.settings = api.settings

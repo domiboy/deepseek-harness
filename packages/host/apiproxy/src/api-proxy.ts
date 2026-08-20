@@ -8,6 +8,8 @@ import { mkdir, stat } from 'node:fs/promises'
 import { homedir } from 'node:os'
 import { dirname } from 'node:path'
 import type { Context } from '@deepseek-ai/cordis'
+// Type-only: pulls the billing Context merge (ctx.billing) into this host program.
+import type {} from '@deepseek-ai/dsh-billing-deepseek'
 import { installModelSelection } from '@deepseek-ai/dsh-agent'
 import type { Agent, ModelSelection, ModelSelectionRef, AgentOptions, AgentStatus } from '@deepseek-ai/dsh-agent'
 import type {} from '@deepseek-ai/dsh-agent-presets/types'
@@ -3171,6 +3173,16 @@ export function createApiProxy(ctx: Context, defaults: ApiProxyDefaults): ApiPro
         } catch (error: unknown) {
           return err(request, { code: 'internal', message: `skill listing failed: ${String(error)}`, details: {} })
         }
+      },
+    },
+
+    billing: {
+      async usage(request) {
+        const billing = ctx.get('billing')
+        if (billing === undefined) {
+          return ok(request, { ok: false, reason: '未装配 billing-deepseek 插件' })
+        }
+        return ok(request, await billing.usage())
       },
     },
 
