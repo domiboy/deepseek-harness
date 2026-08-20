@@ -29,14 +29,14 @@ function displayTitle(node: SessionNode, t: RowTranslate): string {
 
 
 /**
- * Compact CNY cost for a session row (mirrors the conversation footer's
- * formatter; a client package must not import another plugin's internals).
+ * CNY cost for a session row, fixed to two decimals so a row's trailing
+ * figures stay scannable (sub-cent precision belongs to the conversation
+ * footer; a client package must not import another plugin's internals).
  * @param value - the cost in the pricing currency.
  * @returns the display string with the currency symbol.
  */
 function costLabel(value: number): string {
-  const digits = value >= 1 ? 2 : value >= 0.01 ? 4 : 6
-  return `¥${value.toFixed(digits)}`
+  return `¥${value.toFixed(2)}`
 }
 
 /** Localized compact relative time ("刚刚"/"5分钟" in zh, "now"/"5min" in en). */

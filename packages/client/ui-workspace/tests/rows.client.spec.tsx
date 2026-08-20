@@ -156,7 +156,7 @@ describe('workspace browser rows', () => {
       <SessionNodeItem node={node} currentId={undefined} now={0} onOpen={vi.fn()}
         onRename={vi.fn()} onFork={vi.fn()} onArchive={vi.fn()} t={t} />,
     )
-    expect(screen.getByTitle('对话总花费').textContent).toBe('¥0.0120')
+    expect(screen.getByTitle('对话总花费').textContent).toBe('¥0.01')
   })
 
   it('shows the green done dot only on a finished, unviewed session (live activity wins the slot)', () => {

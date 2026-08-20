@@ -214,6 +214,7 @@
 
 .cost {
   flex: none;
+  margin: 0 8px;
   font-size: 11px;
   line-height: 20px;
   color: var(--dsw-alias-label-tertiary);
